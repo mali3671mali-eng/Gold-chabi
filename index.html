@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Golden Piggy Slot Game</title>
+<style>
+  :root {
+    --gold-main: #f5c042;
+    --gold-bright: #ffe680;
+    --gold-dark: #8b5a00;
+    --gold-border: #d4a017;
+    --bg-dark: #2a0800;
+    --reel-green: linear-gradient(180deg, #023812 0%, #008f30 50%, #023812 100%);
+    --panel-red: #d11a1a;
+  }
+
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: #120200;
+    font-family: 'Arial Black', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #fff;
+  }
+
+  .game-container {
+    width: 100%;
+    max-width: 420px;
+    height: 900px;
+    max-height: 98vh;
+    background: radial-gradient(circle, #5c1100 0%, #1a0300 100%);
+    border: 3px solid var(--gold-border);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(245, 192, 66, 0.3);
+  }
+
+  /* ---- HEADER ---- */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    z-index: 2;
+  }
+
+  /* ---- GOLDEN SLOT FRAME ---- */
+  .slot-frame {
+    margin: 0 10px;
+    background: linear-gradient(180deg, #ffd700 0%, #b8860b 30%, #8b5a00 70%, #d4a017 100%);
+    border-radius: 25px;
+    padding: 10px;
+    border: 3px solid #ffe680;
+    box-shadow: inset 0 0 15px #000, 0 10px 20px rgba(0,0,0,0.8);
+    position: relative;
+  }
+
+  .piggy-header {
+    text-align: center;
+    background: linear-gradient(180deg, #ffae00 0%, #a66a00 100%);
+    border-radius: 15px;
+    padding: 6px;
+    margin-bottom: 8px;
+    border: 2px solid #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    font-size: 16px;
+    color: #fff;
+    text-shadow: 2px 2px 4px #000;
+  }
+
+  /* ---- REEL ROWS ---- */
+  .reel-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #110200;
+    padding: 8px;
+    border-radius: 15px;
+    border: 2px solid var(--gold-border);
+  }
+
+  .unlock-banner {
+    background: linear-gradient(90deg, #d4a017, #fff2a3, #d4a017);
+    color: #4a2800;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 900;
+    padding: 6px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+  }
+
+  .reel-row {
+    display: flex;
+    gap: 6px;
+    height: 75px;
+    position: relative;
+  }
+
+  .green-reel {
+    flex: 3;
+    background: var(--reel-green);
+    border: 2px solid var(--gold-bright);
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 32px;
+    color: #ffeb7a;
+    text-shadow: 2px 2px 5px #000, 0 0 10px #ffea00;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 15px #000;
+  }
+
+  .mult-reel {
+    flex: 1;
+    background: linear-gradient(180deg, #ffc107 0%, #ff8f00 100%);
+    border: 2px solid #fff;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+    color: #fff;
+    text-shadow: 1px 1px 3px #000;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+  }
+
+  /* LOCKED ROW OVERLAY */
+  .locked-row::after {
+    content: '🔒 LOCKED';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffe680;
+    font-size: 16px;
+    font-weight: bold;
+    backdrop-filter: blur(2px);
+    z-index: 2;
+  }
+
+  .bonus-trigger-bar {
+    background: #000;
+    border: 2px solid var(--gold-main);
+    border-radius: 20px;
+    padding: 6px 12px;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--gold-bright);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: glow 1.5s infinite alternate;
+  }
+
+  @keyframes glow {
+    from { box-shadow: 0 0 5px #f5c042; }
+    to { box-shadow: 0 0 15px #f5c042; }
+  }
+
+  /* ---- BOTTOM CONTROLS PANEL ---- */
+  .control-panel {
+    background: radial-gradient(circle at center, #8a1300 0%, #300400 100%);
+    padding: 15px 10px 10px 10px;
+    border-top: 4px solid var(--gold-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+  }
+
+  .buy-btn {
+    position: absolute;
+    right: 15px;
+    top: -18px;
+    background: linear-gradient(180deg, #1e88e5 0%, #1565c0 100%);
+    border: 2px solid #fff;
+    border-radius: 12px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+    cursor: pointer;
+  }
+
+  .spin-area {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 5px;
+  }
+
+  .action-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #ffd700 0%, #b8860b 100%);
+    border: 2px solid #fff;
+    color: #301700;
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+  }
+
+  .action-btn:active {
+    transform: scale(0.95);
+  }
+
+  .spin-btn-main {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ff4d4d 0%, #b30000 70%, #660000 100%);
+    border: 4px solid var(--gold-bright);
+    box-shadow: 0 0 20px #ff3333, inset 0 0 15px #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+
+  .spin-btn-main:active {
+    transform: scale(0.92);
+  }
+
+  .spin-icon {
+    width: 40px;
+    height: 40px;
+    border: 5px solid #fff;
+    border-top: 5px solid transparent;
+    border-radius: 50%;
+  }
+
+  /* ---- BOTTOM BALANCE BAR ---- */
+  .bottom-info-bar {
+    width: 100%;
+    background: #0d0200;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    border-top: 1px solid #3d1400;
+    font-size: 13px;
+  }
+
+  .info-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info-title {
+    font-size: 10px;
+    color: #888;
+  }
+
+  .info-value {
+    color: var(--gold-bright);
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<div class="game-container">
+  
+  <!-- Top Stats -->
+  <div class="top-bar">
+    <span>v4.27.9</span>
+    <span>📶 0.00 KB/s</span>
+  </div>
+
+  <!-- Main Slot Machine -->
+  <div class="slot-frame">
+    <div class="piggy-header">
+      🐷 UNLOCKS AT BET 50
+    </div>
+
+    <div class="reel-container">
+      <!-- Top Row (Locked) -->
+      <div class="reel-row locked-row">
+        <div class="green-reel"><span>2</span><span>5</span><span>0</span></div>
+        <div class="mult-reel">3x</div>
+      </div>
+
+      <!-- Middle Row (Locked) -->
+      <div class="reel-row locked-row">
+        <div class="green-reel"><span>1</span><span>0</span><span>0</span></div>
+        <div class="mult-reel">🔑</div>
+      </div>
+
+      <div class="unlock-banner">
+        BET 10 UNLOCK 10x
+      </div>
+
+      <!-- Active Bottom Row -->
+      <div class="reel-row">
+        <div class="green-reel" id="reel-1">
+          <span class="num">5</span>
+          <span class="num">0</span>
+          <span class="num">1</span>
+        </div>
+        <div class="mult-reel" id="mult-1">5x</div>
+      </div>
+    </div>
+
+    <!-- Bonus Bar -->
+    <div class="bonus-trigger-bar">
+      <span>🐷 TRIGGER BONUS GAME</span>
+    </div>
+  </div>
+
+  <!-- Controls Section -->
+  <div class="control-panel">
+    <div class="buy-btn">⭐ BUY</div>
+
+    <div class="spin-area">
+      <div class="action-btn" id="btn-minus">-</div>
+      
+      <div class="spin-btn-main" id="spin-button">
+        <div class="spin-icon"></div>
+      </div>
+
+      <div class="action-btn" id="btn-plus">+</div>
+      <div class="action-btn" style="font-size: 14px;">▶</div>
+    </div>
+  </div>
+
+  <!-- Bottom Info Bar -->
+  <div class="bottom-info-bar">
+    <div class="info-box">
+      <span class="info-title">BALANCE</span>
+      <span class="info-value" id="balance-val">Rs 100.00</span>
+    </div>
+    <div class="info-box">
+      <span class="info-title">BET</span>
+      <span class="info-value" id="bet-val">Rs 5.00</span>
+    </div>
+    <div class="info-box">
+      <span class="info-title">WIN</span>
+      <span class="info-value" id="win-val">Rs 0.00</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let balance = 100.00;
+  let bet = 5.00;
+  let isSpinning = false;
+
+  const spinBtn = document.getElementById('spin-button');
+  const btnPlus = document.getElementById('btn-plus');
+  const btnMinus = document.getElementById('btn-minus');
+  
+  const balanceVal = document.getElementById('balance-val');
+  const betVal = document.getElementById('bet-val');
+  const winVal = document.getElementById('win-val');
+
+  const reelNumbers = document.querySelectorAll('#reel-1 .num');
+  const multReel = document.getElementById('mult-1');
+
+  const multipliers = ['2x', '3x', '5x', '10x'];
+
+  // Bet Control
+  btnPlus.addEventListener('click', () => {
+    if(isSpinning) return;
+    bet += 5;
+    betVal.innerText = `Rs ${bet.toFixed(2)}`;
+  });
+
+  btnMinus.addEventListener('click', () => {
+    if(isSpinning || bet <= 5) return;
+    bet -= 5;
+    betVal.innerText = `Rs ${bet.toFixed(2)}`;
+  });
+
+  // Spin Logic
+  spinBtn.addEventListener('click', () => {
+    if (isSpinning) return;
+    if (balance < bet) {
+      alert("पर्याप्त बैलेंस नहीं है!");
+      return;
+    }
+
+    isSpinning = true;
+    balance -= bet;
+    balanceVal.innerText = `Rs ${balance.toFixed(2)}`;
+    winVal.innerText = `Rs 0.00`;
+
+    // Roll animation
+    let duration = 1500;
+    let interval = setInterval(() => {
+      reelNumbers.forEach(num => {
+        num.innerText = Math.floor(Math.random() * 10);
+      });
+      multReel.innerText = multipliers[Math.floor(Math.random() * multipliers.length)];
+    }, 80);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      
+      // Calculate Result
+      let n1 = Math.floor(Math.random() * 10);
+      let n2 = Math.floor(Math.random() * 10);
+      let n3 = Math.floor(Math.random() * 10);
+      let selectedMult = multipliers[Math.floor(Math.random() * multipliers.length)];
+
+      reelNumbers[0].innerText = n1;
+      reelNumbers[1].innerText = n2;
+      reelNumbers[2].innerText = n3;
+      multReel.innerText = selectedMult;
+
+      // Win logic
+      let multValue = parseInt(selectedMult);
+      let winAmount = 0;
+
+      if (n1 === n2 && n2 === n3) {
+        winAmount = bet * 10 * multValue; // Big Win
+      } else if (n1 === n2 || n2 === n3 || n1 === n3) {
+        winAmount = bet * 2 * multValue; // Small Win
+      }
+
+      if (winAmount > 0) {
+        balance += winAmount;
+        balanceVal.innerText = `Rs ${balance.toFixed(2)}`;
+        winVal.innerText = `Rs ${winAmount.toFixed(2)}`;
+      }
+
+      isSpinning = false;
+    }, duration);
+  });
+</script>
+
+</body>
+</html>
